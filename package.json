@@ -1,0 +1,25 @@
+{
+  "name": "node-auth",
+  "main": "www.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/wizardnet972/node-auth"
+  },
+  "scripts": {
+    "start": "node www",
+    "watch": "nodemon www"
+  },
+  "author": "Shlomi Levi <wizardnet972>",
+  "license": "MIT",
+  "dependencies": {
+    "bcrypt": "^1.0.1",
+    "body-parser": "^1.15.0",
+    "express": "^4.13.4",
+    "jsonwebtoken": "^5.7.0",
+    "mongodb": "^2.2.15",
+    "mongoose": "^4.4.5",
+    "morgan": "^1.7.0",
+    "node-promise": "^0.5.12",
+    "promise": "^7.1.1"
+  }
+}
