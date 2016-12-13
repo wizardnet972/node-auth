@@ -22,7 +22,7 @@ router.post('/signup', (req, res) => {
 
             user.save()
                 .then(user => {
-                    console.log('User created successfully.', user.toObject());
+                    console.log('User created successfully.');
                     res.status(201).json({ userId: user.id });
                 })
                 .catch(err => {
