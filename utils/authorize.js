@@ -1,7 +1,4 @@
 const jwt = require('jsonwebtoken');
-const express = require('express');
-
-const router = express.Router();
 
 function authorize(router, secret) {
 
@@ -13,17 +10,16 @@ function authorize(router, secret) {
             return res.status(403).send({ message: 'invalid token' });
         }
 
-        jwt.verify(token, secret || req.app.get('secret'), (err, decoded) => {
+        jwt.verify(token, secret || req.app.get('secret'), (err, payload) => {
+
             if (err) {
-                return res.status(401).json({ message: 'unauthorized' });
+                return res.sendStatus(401);
             }
 
-            req.decoded = decoded;
+            req.payload = payload;
             next();
         });
     });
-
 }
 
 module.exports = authorize;
-

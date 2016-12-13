@@ -1,11 +1,16 @@
 const jwt = require('jsonwebtoken');
 const express = require('express');
-const User = require('../db/user');
 const crypt = require('../../utils/crypt');
-
+const UserModel = require('../db/user');
+const User = UserModel.User;
 const router = express.Router();
 
+router.get('/', (req, res) => {
+    res.send({});
+})
+
 router.use('/users', require('./users'));
+router.use('/user', require('./user'));
 
 router.post('/signup', (req, res) => {
 
@@ -13,29 +18,25 @@ router.post('/signup', (req, res) => {
         .cryptPassword(req.body.password)
         .then(hash => {
 
-            const user = new User({
-                name: req.body.name,
-                password: hash,
-                admin: true
-            });
+            let user = new User(Object.assign({}, req.body, { password: hash }));
 
             user.save()
-                .then(() => {
-                    console.log('User created successfully.');
+                .then(user => {
+                    console.log('User created successfully.', user.toObject());
                     res.status(201).json({ userId: user.id });
                 })
                 .catch(err => {
-                    throw err;
+                    res.status(500).json(err);
                 });
-           
+
         }).catch(err => {
-            res.status(500).json({ message: "Signup failed." });
+            res.status(500).json(err);
         })
 });
 
 router.post('/login', (req, res) => {
 
-    User.findOne({ name: req.body.name })
+    User.findOne({ email: req.body.email })
         .then(user => {
 
             if (!user) {
@@ -47,26 +48,22 @@ router.post('/login', (req, res) => {
                 .comparePassword(req.body.password, user.password)
                 .then(() => {
 
-                    let token = jwt.sign(user, req.app.get('secret'), {
+                    let token = jwt.sign({ userId: user.id }, req.app.get('secret'), {
                         expiresIn: req.app.get('expiresToken')
                     });
 
                     res.json({
-                        user: {
-                            id: user.id,
-                            name: user.name
-                        },
+                        user: UserModel.normalize(user),
                         token: token
                     });
                 })
                 .catch(error => {
                     console.error('error on login', error);
-
                     res.status(400).send({ error: "Worng password" });
                 });
         })
         .catch(err => {
-            throw err;
+            res.status(500).json(err);
         })
 });
 

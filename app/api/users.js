@@ -1,38 +1,45 @@
 const express = require('express');
-const User = require('../db/user');
-const AuthorizeRequire = require('../../utils/authorize');
-
+const Authorize = require('../../utils/authorize');
+const UserModel = require('../db/user');
+const User = UserModel.User;
 const router = express.Router();
 
-AuthorizeRequire(router);
+Authorize(router);
 
 router.get('/', (req, res) => {
 
-    User
-        .find({})
+    User.find({})
         .then(users => {
-            res.json(users);
+            res.json({
+                users: users.map(user => UserModel.normalize(user))
+            });
         });
 });
 
 router
     .route('/:userId')
+
     .get((req, res) => {
-        User
-            .findById(req.params.userId)
+
+        User.findById(req.params.userId)
             .then(user => {
-                res.json(user);
+                if (!user) { res.sendStatus(404); return; }
+
+                res.json(UserModel.normalize(user));
             })
             .catch(err => {
                 res.status(500).send(err);
             });
     })
+
     .put((req, res) => {
-        User
-            .findById(req.params.userId)
+
+        User.findById(req.params.userId)
             .then(user => {
-                user.name = req.body.name;
-                user.save()
+                if (!user) { res.sendStatus(404); return; }
+
+                UserModel.update(user, req.body)
+                    .save()
                     .then(user => {
                         res.json({ userId: user.id });
                     })
@@ -44,19 +51,16 @@ router
                 res.status(500).send(err);
             });
     })
+
     .delete((req, res) => {
-        User
-            .remove({
-                _id: req.params.userId
-            })
+
+        User.remove({ _id: req.params.userId })
             .then(() => {
                 res.json({ delete: true });
             })
             .catch(err => {
                 res.status(500).send(err);
-            })
+            });
     });
 
-
 module.exports = router;
-
