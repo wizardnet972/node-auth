@@ -1,5 +1,7 @@
 # Node Authentication Server
 
+[by @wizardnet972](http://www.github.com/wizardnet972)
+
 [![N|Solid](https://cldup.com/dTxpPi9lDf.thumb.png)](https://nodesource.com/products/nsolid)
 
 ### What is it?
